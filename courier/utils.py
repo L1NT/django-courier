@@ -2,13 +2,12 @@ import logging, datetime
 
 from django.db.models import signals
 from django.db.models import get_model 
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.template import Context, Template
 from courier.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
 
-#from contrib.core.debug import brake
 
 log = logging.getLogger('courier')
 
@@ -148,7 +147,9 @@ def send_notification(notification, instance, created=False):
     start_time = datetime.datetime.today()
     log.debug(u"Courier: trying to send \"%s\" notification to %s from %s" % (subject, ", ".join(recipients), notification.from_email))
 
-    send_mail(subject, body, notification.from_email, recipients, fail_silently=settings.FAIL_SILENTLY)
+    message = EmailMessage(subject, body, notification.from_email, recipients)
+    message.content_subtype = "html"
+    message.send()
 
     end_time = datetime.datetime.today()
     log.debug(u"Courier: \"%s\" notification sent to %s from %s (%ss)" % (subject, ", ".join(recipients), notification.from_email, end_time - start_time))
