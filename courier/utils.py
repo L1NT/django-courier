@@ -135,13 +135,11 @@ def send_notification(notification, instance, created=False):
     recipients = parse_recipients(notification.recipients, instance)
     subject    = Template(template.subject).render(Context({
         '%s' % notification.object_name: instance,
-        'site_name': site.name,
-        'site_domain': site.domain,
+        'site': site,
     }))
     body       = Template(template.body).render(Context({
         '%s' % notification.object_name: instance,
-        'site_name': site.name,
-        'site_domain': site.domain,
+        'site': site,
     }))
 
     start_time = datetime.datetime.today()
