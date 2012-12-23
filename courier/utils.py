@@ -8,9 +8,12 @@ from courier.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
 
+from courier.models import EmailRecipient
 
 log = logging.getLogger('courier')
 
+"""
+#commented out in favor of a seperate Recipient Model
 def parse_recipients(r, inst):
     out = []
     emails = map(lambda x: x.strip(), r.split(','))
@@ -37,7 +40,7 @@ def parse_recipients(r, inst):
             else:
                 out.append(e)
     return out
-
+"""
 
 def attach_signal(signal_name, content_type_pk):
     """
@@ -132,7 +135,7 @@ def send_notification(notification, instance, created=False):
 
     site       = Site.objects.get(id=settings.SITE_ID)
     template   = notification.template
-    recipients = parse_recipients(notification.recipients, instance)
+    recipients = EmailRecipient.objects.filter(notification_id=notification)
     subject    = Template(template.subject).render(Context({
         '%s' % notification.object_name: instance,
         'site': site,
@@ -143,11 +146,12 @@ def send_notification(notification, instance, created=False):
     }))
 
     start_time = datetime.datetime.today()
-    log.debug(u"Courier: trying to send \"%s\" notification to %s from %s" % (subject, ", ".join(recipients), notification.from_email))
+    log.debug(u"Courier: trying to send \"%s\" notification from %s" % (subject, notification.from_email))
 
-    message = EmailMessage(subject, body, notification.from_email, recipients)
-    message.content_subtype = "html"
-    message.send()
+    for recipient in recipients:
+        message = EmailMessage(subject, body, notification.from_email, [recipient.email])
+        message.content_subtype = "html"
+        message.send()
 
     end_time = datetime.datetime.today()
-    log.debug(u"Courier: \"%s\" notification sent to %s from %s (%ss)" % (subject, ", ".join(recipients), notification.from_email, end_time - start_time))
+    log.debug(u"Courier: \"%s\" notification sent from %s (%ss)" % (subject, notification.from_email, end_time - start_time))

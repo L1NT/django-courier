@@ -41,7 +41,6 @@ class EmailNotification(models.Model):
     content_type = models.ForeignKey(ContentType, verbose_name=_('Model'))
     signal       = models.CharField(_('Send when'), max_length=250, choices=SIGNAL_CHOICES, default="post_create")
     template     = models.ForeignKey(EmailTemplate, verbose_name=_('Template'), null=True, blank=True, on_delete=getattr(models, settings.EMAILTEMPLATE_ON_DELETE))
-    recipients   = models.CharField(_('Recipients'), max_length=250, default="DEFAULT_EMAIL_TO", help_text=_('Ex: some@email.com, another@email.com, object.email, DEFAULT_EMAIL_TO'))
     from_email   = models.CharField(_('From email'), max_length=250, default=settings.DEFAULT_EMAIL_FROM)
     object_name  = models.CharField(_('Template object name'), max_length=150, default='object')
     is_active    = models.BooleanField(_('Is active'), default=True)
@@ -52,6 +51,20 @@ class EmailNotification(models.Model):
     class Meta:
         verbose_name = _('Email notification')
         verbose_name_plural = _('Email notifications')
+        
+class EmailRecipient(models.Model):
+    """
+    Holds a mapping of Recipients to the list of notifications
+    """
+    notification = models.ForeignKey(EmailNotification)
+    email        = models.CharField(max_length=250)
+    
+    def __unicode__(self):
+        return u'%s' % self.email
+
+    class Meta:
+        verbose_name = _('Email recipient')
+        verbose_name_plural = _('Email recipients')
 
 
 try:

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from courier.models import EmailTemplate, EmailNotification
+from courier.models import EmailTemplate, EmailNotification, EmailRecipient
 
 try:
     # A special fork of modeltranslation I use ..
@@ -35,19 +35,19 @@ class EmailTemplateAdmin(BaseClass):
 admin.site.register(EmailTemplate, EmailTemplateAdmin)
 
 
-def desactivate(modeladmin, request, queryset):
+def deactivate(modeladmin, request, queryset):
     queryset.update(is_active=False)
-desactivate.short_description = _("Desactivate selected email notifications")
+deactivate.short_description = _("Deactivate selected email notifications")
 
 def activate(modeladmin, request, queryset):
     queryset.update(is_active=True)
 activate.short_description = _("Activate selected email notifications")
 
 class EmailNotificationAdmin(admin.ModelAdmin):
-    list_display = ('title', 'signal', 'from_email', 'recipients', 'template', 'is_active')
+    list_display = ('title', 'signal', 'from_email', 'template', 'is_active')
     search_fields = ('title', )
     list_filter = ('is_active', 'signal')
-    actions = [activate, desactivate]
+    actions = [activate, deactivate]
 admin.site.register(EmailNotification, EmailNotificationAdmin)
 
-
+admin.site.register(EmailRecipient)
