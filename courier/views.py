@@ -25,6 +25,6 @@ class AddRecipient(View):
             title = request.GET.get('notification', '')
             notification = EmailNotification.objects.get(title=title)
             recipient.notification = notification
-            recipient.save()
-            return HttpResponse(recipient.email)
-
+            if not EmailRecipient.objects.filter(email=recipient.email, notification=recipient.notification):
+                recipient.save()
+                return HttpResponse(recipient.email)
