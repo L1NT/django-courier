@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.views.generic.edit import View
 
 from courier.models import EmailRecipient, EmailNotification
@@ -22,9 +22,15 @@ class AddRecipient(View):
         if request.GET:
             recipient = EmailRecipient()
             recipient.email = request.GET.get('email', '')
-            title = request.GET.get('notification', '')
-            notification = EmailNotification.objects.get(title=title)
-            recipient.notification = notification
-            if not EmailRecipient.objects.filter(email=recipient.email, notification=recipient.notification):
-                recipient.save()
-                return HttpResponse(recipient.email)
+            if recipient.email != '':
+                title = request.GET.get('notification', '')
+                notification = EmailNotification.objects.get(title=title)
+                recipient.notification = notification
+                if not EmailRecipient.objects.filter(email=recipient.email, notification=recipient.notification):
+                    recipient.save()
+                    return HttpResponse(recipient.email)
+                else:
+                    return HttpResponseForbidden('Notification recipient already exists.')
+            else:
+                return HttpResponseForbidden('Email not set.')
+        
