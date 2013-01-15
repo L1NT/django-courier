@@ -33,4 +33,26 @@ class AddRecipient(View):
                     return HttpResponseForbidden('Notification recipient already exists.')
             else:
                 return HttpResponseForbidden('Email not set.')
-        
+
+class OptOut(View):
+    """
+    Removes an email from the database.
+    Accepts the following GET parameters:
+        email: the email to be removed
+        notification: the EmailNotification.title, or all if not provided
+    """
+    
+    model = EmailRecipient
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.GET:
+           delemail = request.GET.get('email')
+           title = request.GET.get('notification', '')
+           if title != '':
+              notification = EmailNotification.objects.get(title=title)
+              EmailRecipient.objects.filter(email=delemail, notification=notification).delete()
+              return HttpResponse(delemail + ' has been removed from the list of ' + title + ' notifications.')
+           else:
+              EmailRecipient.objects.filter(email=delemail).delete()
+              return HttpResponse(delemail + ' will no longer receive emails from Still a Dancing Queen.')
+           return HttpResponse('That email wasn\'t found in our list of recipients.')

@@ -140,15 +140,16 @@ def send_notification(notification, instance, created=False):
         '%s' % notification.object_name: instance,
         'site': site,
     }))
-    body       = Template(template.body).render(Context({
-        '%s' % notification.object_name: instance,
-        'site': site,
-    }))
-
+    
     start_time = datetime.datetime.today()
     log.debug(u"Courier: trying to send \"%s\" notification from %s" % (subject, notification.from_email))
 
     for recipient in recipients:
+        body = Template(template.body).render(Context({
+           '%s' % notification.object_name: instance,
+           'site': site,
+           'recipient': recipient,
+        }))
         message = EmailMessage(subject, body, notification.from_email, [recipient.email])
         message.content_subtype = "html"
         message.send()
