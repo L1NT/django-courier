@@ -12,36 +12,6 @@ from courier.models import EmailRecipient
 
 log = logging.getLogger('courier')
 
-"""
-#commented out in favor of a seperate Recipient Model
-def parse_recipients(r, inst):
-    out = []
-    emails = map(lambda x: x.strip(), r.split(','))
-    
-    def get_email(e, inst):
-        if e.startswith('object.'):
-            try:
-                return inst.__getattribute__(e[7:])
-            except:
-                return False
-        elif e == 'DEFAULT_EMAIL_TO':
-            if hasattr(settings, 'DEFAULT_EMAIL_TO'):
-                return settings.DEFAULT_EMAIL_TO
-            else:
-                return False
-        else:
-            return e
-
-    for email in emails:
-        e = get_email(email, inst)
-        if e:
-            if isinstance(e, list) :
-                out.extend(e)
-            else:
-                out.append(e)
-    return out
-"""
-
 def attach_signal(signal_name, content_type_pk):
     """
     Attach a given signal to a content type

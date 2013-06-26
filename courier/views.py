@@ -14,10 +14,6 @@ class AddRecipient(View):
     
     model = EmailRecipient
     
-    def add_recipient(self):
-        if self.request.GET:
-            return HttpResponse("test response")
-            
     def dispatch(self, request, *args, **kwargs):
         if request.GET:
             recipient = EmailRecipient()
