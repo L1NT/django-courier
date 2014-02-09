@@ -25,7 +25,8 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Framework :: Django',
-    ]
+    ],
+    use_2to3 = True,
 )
 
 
