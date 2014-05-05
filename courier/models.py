@@ -86,7 +86,7 @@ except:
 else:
     from django.db.models.signals import post_save, pre_save, pre_delete
     from courier.utils import attach_signals, attach_signal, detach_signal
-    from django.utils import json
+    from django.utils import simplejson as json
 
     def get_context_object_vars(model, inst):
         out = {
