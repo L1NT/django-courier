@@ -4,10 +4,13 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.dispatch import receiver
 from django.utils.translation import gettext as _
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 
 from courier.conf import settings
 
 
+@python_2_unicode_compatible
 class EmailTemplate(models.Model):
     """
     EmailTemplate are standard text email template
@@ -19,14 +22,15 @@ class EmailTemplate(models.Model):
     body      = models.TextField(_('Body'), blank=True, null=True, help_text=_('Ex: Hello {{ object.firstname }} !'))
     variables = models.TextField(_('Variables'), blank=True, null=True)
 
-    def __unicode__(self):
-        return u'%s' % self.slug
+    def __str__(self):
+        return self.slug
 
     class Meta:
         verbose_name = _('Email template')
         verbose_name_plural = _('Email templates')
 
 
+@python_2_unicode_compatible
 class EmailNotification(models.Model):
     """
     An EmailNotification binds a content_type, a signal and 
@@ -45,23 +49,25 @@ class EmailNotification(models.Model):
     object_name  = models.CharField(_('Template object name'), max_length=150, default='object')
     is_active    = models.BooleanField(_('Is active'), default=True)
     
-    def __unicode__(self):
-        return u'%s' % self.title
+    def __str__(self):
+        return self.title
     
     class Meta:
         verbose_name = _('Email notification')
         verbose_name_plural = _('Email notifications')
         
+
+@python_2_unicode_compatible
 class EmailRecipient(models.Model):
     """
     Holds a mapping of Recipients to the list of notifications
     """
     notification = models.ForeignKey(EmailNotification)
     email        = models.CharField(max_length=250)
-    
-    def __unicode__(self):
-        return u'%s' % self.email
 
+    def __str__(self):
+        return ' '.join([self.email, '[', self.notification.title, ']'])
+        
     class Meta:
         verbose_name = _('Email recipient')
         verbose_name_plural = _('Email recipients')
